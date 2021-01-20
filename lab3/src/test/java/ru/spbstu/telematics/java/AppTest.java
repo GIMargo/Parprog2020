@@ -14,84 +14,62 @@ public class AppTest
     public void testDelay()
     {
   
-    	TrafficLights t=new TrafficLights();
     	int waitTime=50;
-    	Random r = new Random();
-    	for(int i=0;i<100;i++) {
-    		t.putCar(new Car(r.nextInt()%3,t,waitTime));
-    	}
+    	int passtime=30;
     	int delay = 100;
-    	System.out.println("Ожидание зелёного сигнала для машин = " + waitTime + "; время горения зелёного сигнала светофора = " + delay);
+    	TrafficLights t=new TrafficLights(delay);
+    	Random r = new Random();
+    	for(int i=0;i<200;i++) {
+    		t.putCar(new Car(r.nextInt()%3,t,waitTime,passtime));
+    	}
     	 while(t.getNS()>0||t.getSW()>0||t.getWE()>0) {
 	            if(t.getNS()!=0) {
 	            	t.GreenLight(0);
 	            	try {
-	            	   Thread.sleep(delay);
+	            		Thread.sleep(t.getGreenTime());
 	            	}
-	            	catch(InterruptedException e) {
-	            		
+	            	catch(InterruptedException e) {	
 	            	}
+	            	t.YellowLight(0);
+	            	try {
+		            	   Thread.sleep(passtime+10);
+		            	}
+		            	catch(InterruptedException e) {	            		
+		            	}
                  t.RedLight(0);
 	            }
 	            if(t.getWE()!=0) {
 	            	t.GreenLight(1);
 	            	try {
-		            	   Thread.sleep(delay);
+	            		Thread.sleep(t.getGreenTime());
 		            	}
-		            	catch(InterruptedException e) {
-		            		
+		            	catch(InterruptedException e) {	
+		            	}
+	            	t.YellowLight(1);
+	            	try {
+		            	   Thread.sleep(passtime+10);
+		            	}
+		            	catch(InterruptedException e) {	            		
 		            	}
 	            	t.RedLight(1);
 	            }
 	            if(t.getSW()!=0) {
 	            	t.GreenLight(2);
 	            	try {
-		            	   Thread.sleep(delay);
+	            		Thread.sleep(t.getGreenTime());
 		            	}
-		            	catch(InterruptedException e) {
-		            		
+		            	catch(InterruptedException e) {		            		
+		            	}
+	            	t.YellowLight(1);
+	            	try {
+		            	   Thread.sleep(passtime+10);
+		            	}
+		            	catch(InterruptedException e) {	            		
 		            	}
 	            	t.RedLight(2);
 	            }
-	            waitTime=100;
-	        	for(int i=0;i<100;i++) {
-	        		t.putCar(new Car(r.nextInt()%3,t,waitTime));
-	        	}
-	             delay = 50;
-	            System.out.println("\nОжидание зелёного сигнала для машин = " + waitTime + "; время горения зелёного сигнала светофора = " + delay);
-	       	 while(t.getNS()>0||t.getSW()>0||t.getWE()>0) {
-		            if(t.getNS()!=0) {
-		            	t.GreenLight(0);
-		            	try {
-		            	   Thread.sleep(delay);
-		            	}
-		            	catch(InterruptedException e) {
-		            		
-		            	}
-	                 t.RedLight(0);
-		            }
-		            if(t.getWE()!=0) {
-		            	t.GreenLight(1);
-		            	try {
-			            	   Thread.sleep(delay);
-			            	}
-			            	catch(InterruptedException e) {
-			            		
-			            	}
-		            	t.RedLight(1);
-		            }
-		            if(t.getSW()!=0) {
-		            	t.GreenLight(2);
-		            	try {
-			            	   Thread.sleep(delay);
-			            	}
-			            	catch(InterruptedException e) {
-			            		
-			            	}
-		            	t.RedLight(2);
-		            }
-	       	 }
+
 	            assertTrue( true );
-    }
+         }
     }
 }

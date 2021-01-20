@@ -5,12 +5,13 @@ public class Car extends Thread {
 	int m_dir; /** направление движения машины */
 	TrafficLights m_t; /** светофор */
 	int m_wait; /** время ожидания зелёного сигнала светофора */
+	int m_passtime; /** время проезда через перекрёсток */
 
 	public Car() {
 		m_dir=0; /** направление движения с севера на юг (NS) */
 	}
 	
-	public Car(int dir, TrafficLights t, int wait) {
+	public Car(int dir, TrafficLights t, int wait,int passtime) {
 		if(dir>=0&&dir<3) {
 			m_dir=dir;
 		}else if(dir>0){
@@ -20,11 +21,16 @@ public class Car extends Thread {
 			m_dir=0;
 		}
 		m_t=t;
-		if(wait>0) {
+		if(wait>0&&wait<m_t.getGreenTime()) {
 		m_wait=wait;
 		}else {
-			m_wait=50;
+			m_wait=m_t.getGreenTime()-10;
 		}
+		if(passtime>0) {
+			m_passtime=passtime;
+			}else {
+				m_passtime=30;
+			}
 	}
 
 	public Car(String name) {
@@ -34,6 +40,10 @@ public class Car extends Thread {
 	
 	public int getDir() {
 		return m_dir;
+	}
+	
+	public int getPassTime() {
+		return m_passtime;
 	}
 	
 	public String getDirName() {
@@ -60,8 +70,8 @@ public class Car extends Thread {
 	}
 
 	
-	public synchronized void run(){
-		boolean ifI = ifI=m_t.ifFirst(this);
+	public void run(){
+		boolean ifI=m_t.ifFirst(this);
 		while(!ifI) {
 			try {
 		        sleep(20);
@@ -70,13 +80,14 @@ public class Car extends Thread {
 			}
 			ifI=m_t.ifFirst(this);
 		}
+		System.out.println("The car number " + getName() + " with direction "+ getDirName()+ " has arrived to the crossroad!");
 	    boolean pass=false;
 		if(m_dir==0) {
 		    while(!pass) {
-			     if(m_t.getLightNS()){
-				    System.out.println("The car number " + getName() + " with direction "+ getDirName()+ " is passing the crossroad!");
-				    m_t.removeCar(m_dir);
+			     if(m_t.getLightNS()==2){
+			    	if(m_t.passing(this)){
 				    pass=true;
+			    	}
 			     }else {
 				      try {
 				          sleep(m_wait);
@@ -84,15 +95,14 @@ public class Car extends Thread {
 				      catch(InterruptedException e) {					
 			          }
 			      }
-		 
 		   }
 		}
 		if(m_dir==1) {
 		    while(!pass) {
-			     if(m_t.getLightWE()){
-				    System.out.println("The car number " + getName() + " with direction "+ getDirName()+ " is passing the crossroad!");
-				    m_t.removeCar(m_dir);
-				    pass=true;
+			     if(m_t.getLightWE()==2){
+				    	if(m_t.passing(this)){
+						    pass=true;
+				    	}
 			     }else {
 				      try {
 					      //System.out.println("The car number " + getName() + " with direction "+ getDirName()+ " is waiting on the crossroad!");
@@ -106,10 +116,10 @@ public class Car extends Thread {
 		}
 		if(m_dir==2) {
 		    while(!pass) {
-			     if(m_t.getLightSW()){
-				    System.out.println("The car number " + getName() + " with direction "+ getDirName()+ " is passing the crossroad!");
-				    m_t.removeCar(m_dir);
-				    pass=true;
+			     if(m_t.getLightSW()==2){
+				    	if(m_t.passing(this)){
+						    pass=true;
+				    	}
 			     }else {
 				      try {
 					      //System.out.println("The car number " + getName() + " with direction "+ getDirName()+ " is waiting on the crossroad!");
@@ -124,3 +134,4 @@ public class Car extends Thread {
 		
         }
 }
+
